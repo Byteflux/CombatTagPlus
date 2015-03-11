@@ -66,6 +66,10 @@ public final class Settings {
         return plugin.getConfig().getBoolean("disable-enderpearls");
     }
 
+    public int getLogoutTime() {
+        return plugin.getConfig().getInt("logout-time", 10);
+    }
+
     public int getNpcDespawnTime() {
         return plugin.getConfig().getInt("npc-despawn-time", 60);
     }

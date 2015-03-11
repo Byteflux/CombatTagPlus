@@ -32,12 +32,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -229,6 +224,15 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
 
             String duration = DurationUtils.format(tag.getTagDuration());
             sender.sendMessage(RED + duration + GRAY + " remaining on your combat timer.");
+        } else if (cmd.getName().equals("ctpluslogout")) {
+            if (!(sender instanceof Player)) return false;
+
+            // Do nothing if player is already logging out
+            Player player = (Player) sender;
+            if (LogoutTask.get(player) != null) return false;
+
+            // Start a new logout task
+            new LogoutTask(this, player);
         }
 
         return true;
@@ -264,6 +268,10 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
 
         // Do nothing if a player logs off in combat in a WorldGuard protected region
         if (!getWorldGuardManager().isPvpEnabledAt(player.getLocation())) return;
+
+        // Do nothing if player has been safely logged out
+        LogoutTask logoutTask = LogoutTask.get(player);
+        if (logoutTask != null && logoutTask.isComplete()) return;
 
         // Kill player if configuration states so
         if (getTagManager().isTagged(player.getUniqueId()) && getSettings().instantlyKill()) {
@@ -645,6 +653,18 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
         // Cancel enderpearl throw
         event.setCancelled(true);
         player.sendMessage(AQUA + "Enderpearls " + RED + " are disabled in combat.");
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void stopLogoutTask(PlayerCombatTagEvent event) {
+        // Do nothing if player is not intending to logout
+        Player player = event.getPlayer();
+        LogoutTask logoutTask = LogoutTask.get(player);
+        if (logoutTask == null) return;
+
+        // Stop logout task
+        logoutTask.stopTask();
+        player.sendMessage(GRAY + "Logout task cancelled due to being tagged.");
     }
 
 }

@@ -134,7 +134,6 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
             public void run() {
                 getTagManager().purgeExpired();
                 BarUpdateTask.purgeFinished();
-                SafeLogoutTask.purgeFinished();
             }
         }, 3600, 3600);
     }
@@ -239,7 +238,8 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
 
             // Do nothing if player is already logging out
             Player player = (Player) sender;
-            if (SafeLogoutTask.hasTask(player)) return true;
+            SafeLogoutTask safeLogoutTask = SafeLogoutTask.get(player);
+            if (safeLogoutTask != null) return false;
 
             // Attempt to start a new logout task
             SafeLogoutTask.run(this, player);
@@ -278,6 +278,10 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
 
         // Do nothing if a player logs off in combat in a WorldGuard protected region
         if (!getWorldGuardManager().isPvpEnabledAt(player.getLocation())) return;
+
+        // Do nothing if player has safely logged out
+        SafeLogoutTask safeLogoutTask = SafeLogoutTask.get(player);
+        if (safeLogoutTask != null && safeLogoutTask.isFinished()) return;
 
         // Kill player if configuration states so
         if (getTagManager().isTagged(player.getUniqueId()) && getSettings().instantlyKill()) {
@@ -663,9 +667,13 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void cancelSafeLogout(PlayerCombatTagEvent event) {
-        // Cancel safe logout attempt if player was just combat tagged
+        // Do nothing if player isn't attempting to safely logout
         Player player = event.getPlayer();
-        if (!SafeLogoutTask.cancel(player)) return;
+        SafeLogoutTask safeLogoutTask = SafeLogoutTask.get(player);
+        if (safeLogoutTask == null) return;
+
+        // Cancel safe logout attempt
+        safeLogoutTask.cancel();
 
         // Inform player
         player.sendMessage(RED + "Logout cancelled due to being combat tagged.");

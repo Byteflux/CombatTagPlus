@@ -791,6 +791,11 @@ public final class CombatTagPlus extends JavaPlugin implements Listener {
             return;
         }
 
+        // Prevent sneaky players crossing the force field
+        if (!isPvpEnabledAt(t) && isPvpEnabledAt(f)) {
+            event.setTo(f.setDirection(t.getDirection()));
+        }
+
         // Update the players force field perspective
         for (Location location : getChangedBlocks(player)) {
             player.sendBlockChange(location, Material.STAINED_GLASS, (byte) 14);

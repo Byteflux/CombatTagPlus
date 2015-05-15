@@ -1,7 +1,10 @@
 package net.minelink.ctplus;
 
+import com.google.common.collect.ImmutableSet;
 import net.minelink.ctplus.compat.api.NpcNameGeneratorFactory;
 import net.minelink.ctplus.compat.api.NpcPlayerHelper;
+import net.minelink.ctplus.forcefield.ForcefieldManager;
+import net.minelink.ctplus.forcefield.Region;
 import net.minelink.ctplus.hook.Hook;
 import net.minelink.ctplus.hook.TownyHook;
 import net.minelink.ctplus.listener.ForceFieldListener;
@@ -14,18 +17,16 @@ import net.minelink.ctplus.task.TagUpdateTask;
 import net.minelink.ctplus.util.DurationUtils;
 import net.minelink.ctplus.util.ReflectionUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.bukkit.ChatColor.*;
 
@@ -92,7 +93,23 @@ public final class CombatTagPlus extends JavaPlugin {
         }
 
         // Register event listeners
-        Bukkit.getPluginManager().registerEvents(new ForceFieldListener(this), this);
+        if (isAdvancedAntiSafezoningSupported()) {
+            ForcefieldManager manager = new ForcefieldManager(this);
+            Bukkit.getPluginManager().registerEvents(manager, this);
+            Bukkit.getLogger().info("[CombatTagPlus] Advanced anti safedzoning is supported");
+        } else {
+            // If they have the default, warn them that their server will lag a lot without advanced anti-safezoning
+            if (getSettings().getForceFieldRadius() >= 100) {
+                Bukkit.getLogger().severe(ChatColor.RED + "[CombatTagPlus] You have a very high value for force-field radius");
+                Bukkit.getLogger().severe(ChatColor.RED + "[CombatTagPlus] This will cause an insane amount of lag");
+                Bukkit.getLogger().severe(ChatColor.RED + "[CombatTagPlus] Either lower the forcefield radius, or activate advanced anti-safezoining");
+                Bukkit.getLogger().severe(ChatColor.RED + "[CombatTagPlus] Disabling");
+                setEnabled(false);
+                return;
+            }
+            Bukkit.getLogger().warning("[CombatTagPlus] Advanced anti safezoning is unsupported");
+            Bukkit.getPluginManager().registerEvents(new ForceFieldListener(this), this);
+        }
         Bukkit.getPluginManager().registerEvents(new NpcListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
         Bukkit.getPluginManager().registerEvents(new TagListener(this), this);
@@ -290,6 +307,72 @@ public final class CombatTagPlus extends JavaPlugin {
             }
         }
         return true;
+    }
+
+    private final Object regionLock = new Object();
+    private ImmutableSet<Region> regionsToBlock = null;
+    public Collection<Region> getRegionsToBlock() {
+        if (System.currentTimeMillis() % 10 * 60 * 1000 == 0) { //Refresh every 10 minutes
+            if (!Bukkit.isPrimaryThread()) { //Dont Block the current thread!
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        refreshRegionsToBlock();
+                    }
+                }.runTask(this);
+            } else {
+                refreshRegionsToBlock();
+            }
+        }
+        if (regionsToBlock == null) {
+            synchronized (regionLock) {
+                if (regionsToBlock == null) {
+                    refreshRegionsToBlock();
+                    return regionsToBlock;
+                }
+            }
+        }
+        return regionsToBlock;
+    }
+
+    private void refreshRegionsToBlock() {
+        if (!Bukkit.isPrimaryThread()) { //Just in case some idiot nulled out the cache
+            final Object lock = new Object();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    synchronized (lock) {
+                        refreshRegionsToBlock();
+                        lock.notifyAll();
+                    }
+                }
+            }.runTask(this);
+            while (true) {
+                synchronized (lock) {
+                    try {
+                        lock.wait();
+                        break;
+                    } catch (InterruptedException ex) {}
+                }
+            }
+        }
+        synchronized (regionLock) {
+            regionsToBlock = null;
+            ImmutableSet.Builder builder = ImmutableSet.builder();
+            for (Hook hook : hooks) {
+                if (hook.isAdvancedAntiSafezoningSupported()) {
+                    builder.addAll(hook.getRegionsToBlock());
+                }
+            }
+            regionsToBlock = builder.build();
+        }
+    }
+
+    public boolean isAdvancedAntiSafezoningSupported() {
+        for (Hook hook : hooks) {
+            if (hook.isAdvancedAntiSafezoningSupported()) return true;
+        }
+        return false;
     }
 
 }

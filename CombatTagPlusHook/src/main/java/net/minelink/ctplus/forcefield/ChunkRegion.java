@@ -121,4 +121,18 @@ public class ChunkRegion implements Region {
     public String getName() {
         return name;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) return false;
+        if (other instanceof ChunkRegion) {
+            return name.equals(((ChunkRegion) other).name);
+        }
+        return false;
+    }
 }

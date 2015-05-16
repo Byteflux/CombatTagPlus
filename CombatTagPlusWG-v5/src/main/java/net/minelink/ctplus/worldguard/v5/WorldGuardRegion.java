@@ -69,6 +69,10 @@ public class WorldGuardRegion implements Region {
 
     @Override
     public boolean equals(Object other) {
-        return region.equals(other);
+        if (other == this) return false;
+        if (other instanceof WorldGuardRegion) {
+            return region.equals(((WorldGuardRegion) other).region);
+        }
+        return false;
     }
 }

@@ -91,8 +91,10 @@ barapi-countdown-message: '&eCombatTag: &f{remaining}'
 # Enables force fields around Anti-PvP zones while in combat.
 force-fields: true
 
-# Radius in blocks around the player that should be checked for forcefields (Higher numbers = more laggy)
-force-field-radius: 3
+# Radius in blocks around the player that should be checked for forcefields
+# Lower numbers can cause the player to be able to bypass forcefields if the plugin doesn't update fast enough
+# WARNING: If advanced anti-safezoning is unsupported high values will lag the server
+force-field-radius: 100 # Set to 3 if advanced-antisafezoning is unsupported
 
 # Material of the forcefield block type.
 force-field-material: STAINED_GLASS

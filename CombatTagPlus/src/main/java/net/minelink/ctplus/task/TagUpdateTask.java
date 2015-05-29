@@ -1,8 +1,8 @@
 package net.minelink.ctplus.task;
 
-import me.confuser.barapi.BarAPI;
 import net.minelink.ctplus.CombatTagPlus;
 import net.minelink.ctplus.Tag;
+import net.minelink.ctplus.bossbar.BossBar;
 import net.minelink.ctplus.util.DurationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,16 +36,25 @@ public final class TagUpdateTask extends BukkitRunnable {
             return;
         }
 
+        final BossBar bar = plugin.getSettings().useBarApi() ? BossBar.getBossBar(plugin, player) : null;
         // Remove bar before displaying the next one
-        if (plugin.getSettings().useBarApi() && BarAPI.hasBar(player)) {
-            BarAPI.removeBar(player);
+        if (plugin.getSettings().useBarApi()) {
+            bar.stopShowing();
         }
 
         // Cancel if player is no longer tagged
         Tag tag = plugin.getTagManager().getTag(playerId);
         if (tag == null || tag.isExpired()) {
             if (plugin.getSettings().useBarApi()) {
-                BarAPI.setMessage(player, plugin.getSettings().getBarApiEndedMessage(), 1);
+                bar.setMessage(plugin.getSettings().getBarApiEndedMessage());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!plugin.getTagManager().isTagged(playerId)) {
+                            bar.stopShowing();
+                        }
+                    }
+                }.runTaskLater(plugin, 20);
             }
 
             if (!plugin.getSettings().getUntagMessage().isEmpty()) {
@@ -63,7 +72,8 @@ public final class TagUpdateTask extends BukkitRunnable {
 
             // Display remaining timer in boss bar
             String message = plugin.getSettings().getBarApiCountdownMessage().replace("{remaining}", remaining);
-            BarAPI.setMessage(player, message, percent);
+            bar.setMessage(message);
+            bar.setPercentage((int)percent);
         }
     }
 
@@ -117,8 +127,9 @@ public final class TagUpdateTask extends BukkitRunnable {
         while (iterator.hasNext()) {
             UUID uuid = iterator.next();
             Player player = plugin.getPlayerCache().getPlayer(uuid);
-            if (player != null && plugin.getSettings().useBarApi() && BarAPI.hasBar(player)) {
-                BarAPI.removeBar(player);
+            if (player != null && plugin.getSettings().useBarApi()) {
+                BossBar bar = BossBar.getBossBar(plugin, player);
+                bar.stopShowing();
             }
 
             int taskId = tasks.get(uuid);

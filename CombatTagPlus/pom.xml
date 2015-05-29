@@ -63,10 +63,6 @@
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
-    <repository>
-      <id>confuser-repo</id>
-      <url>http://ci.frostcast.net/plugin/repository/everything</url>
-    </repository>
   </repositories>
 
   <dependencies>
@@ -159,12 +155,6 @@
       <artifactId>CombatTagPlusWG-v6</artifactId>
       <version>1.2.1-SNAPSHOT</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>me.confuser</groupId>
-      <artifactId>BarAPI</artifactId>
-      <version>3.3</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.shininet.bukkit</groupId>

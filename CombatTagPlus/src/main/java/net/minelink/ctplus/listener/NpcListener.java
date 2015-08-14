@@ -102,27 +102,29 @@ public final class NpcListener implements Listener {
 
     @EventHandler
     public void hitNpc(EntityDamageByEntityEvent event) {
+        //Reset the time if the configuration says so
+        if (plugin.getSettings().resetTimeOnHit()) {
+
         // Do nothing if player is not a NPC
         Player player = (Player)event.getEntity();
-        UUID playerId = (UUID)event.getEntity().getUniqueId();
         if (!plugin.getNpcPlayerHelper().isNpc(player)) return;
 
-        // Get NPC player is hitting
+        // Fetch NPC the player is hitting
         UUID id = plugin.getNpcPlayerHelper().getIdentity(player).getId();
         final Npc npc = plugin.getNpcManager().getSpawnedNpc(id);
 
-        // Reset the time if configuration says so
-        if (plugin.getSettings().resetTimeOnHit()) {
-            // Cancel reset task if it's running
-            if (reset != null) {
-                Bukkit.getScheduler().cancelTask(reset.getTaskId());
-            }
-            // Cancel despawn task if it's running
-            if (despawn != null) {
-                Bukkit.getScheduler().cancelTask(despawn.getTaskId());
-            }
+        // Cancel reset task if it's running
+        if (reset != null) {
+            Bukkit.getScheduler().cancelTask(reset.getTaskId());
+        }
 
-            reset = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+        // Cancel despawn task if it's running
+        if (despawn != null) {
+            Bukkit.getScheduler().cancelTask(despawn.getTaskId());
+        }
+
+        // Re-run despawn task
+        reset = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
                 @Override
                 public void run() {
                     plugin.getNpcManager().despawn(npc);

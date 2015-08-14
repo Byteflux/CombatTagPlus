@@ -286,7 +286,7 @@ public final class Settings {
     }
 
     public boolean resetTimeOnHit() {
-	    return plugin.getConfig().getBoolean("reset-time-on-hit");
+        return plugin.getConfig().getBoolean("reset-time-on-hit");
     }
 
     public boolean generateRandomName() {

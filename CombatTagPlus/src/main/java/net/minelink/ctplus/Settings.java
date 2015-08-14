@@ -285,6 +285,10 @@ public final class Settings {
         return getNpcDespawnTime() * 20;
     }
 
+    public boolean resetTimeOnHit() {
+	    return plugin.getConfig().getBoolean("reset-time-on-hit");
+    }
+
     public boolean generateRandomName() {
         return plugin.getConfig().getBoolean("generate-random-name");
     }

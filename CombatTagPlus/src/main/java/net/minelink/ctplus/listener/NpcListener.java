@@ -106,7 +106,8 @@ public final class NpcListener implements Listener {
         if (plugin.getSettings().resetTimeOnHit()) {
 
         // Do nothing if player is not a NPC
-        Player player = (Player)event.getEntity();
+        if (!(event.getEntity() instanceof Player) return;
+        Player player = (Player) event.getEntity();
         if (!plugin.getNpcPlayerHelper().isNpc(player)) return;
 
         // Fetch NPC the player is hitting

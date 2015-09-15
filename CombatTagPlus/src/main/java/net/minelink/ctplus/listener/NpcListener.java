@@ -102,7 +102,7 @@ public final class NpcListener implements Listener {
 
     @EventHandler
     public void hitNpc(EntityDamageByEntityEvent event) {
-        //Reset the time if the configuration says so
+        // Reset the time if the configuration says so
         if (plugin.getSettings().resetTimeOnHit()) {
 
         // Do nothing if player is not a NPC
@@ -114,15 +114,9 @@ public final class NpcListener implements Listener {
         UUID id = plugin.getNpcPlayerHelper().getIdentity(player).getId();
         final Npc npc = plugin.getNpcManager().getSpawnedNpc(id);
 
-        // Cancel reset task if it's running
-        if (reset != null) {
-            Bukkit.getScheduler().cancelTask(reset.getTaskId());
-        }
-
-        // Cancel despawn task if it's running
-        if (despawn != null) {
-            Bukkit.getScheduler().cancelTask(despawn.getTaskId());
-        }
+        // Cancel active despawn tasks
+        if (reset != null) Bukkit.getScheduler().cancelTask(reset.getTaskId());
+        if (despawn != null) Bukkit.getScheduler().cancelTask(despawn.getTaskId());
 
         // Re-run despawn task
         reset = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {

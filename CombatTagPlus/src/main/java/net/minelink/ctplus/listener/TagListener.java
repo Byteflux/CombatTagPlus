@@ -170,20 +170,22 @@ public final class TagListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void sendTagMessage(PlayerCombatTagEvent event) {
         // Do nothing if tag message is blank
-        String message = plugin.getSettings().getTagMessage();
-        if (message.isEmpty()) return;
+        String taggerMessage = plugin.getSettings().getTaggerMessage();
+        String taggeeMessage = plugin.getSettings().getTaggeeMessage();
+        if (taggerMessage.isEmpty() || taggeeMessage.isEmpty()) return;
 
-        // Send combat tag notification to victim
+        Player attacker = event.getAttacker();
         Player victim = event.getVictim();
+        
+        // Send combat tag notification to victim
         if (victim != null && !plugin.getTagManager().isTagged(victim.getUniqueId()) &&
                 !plugin.getSettings().onlyTagAttacker()) {
-            victim.sendMessage(message);
+            victim.sendMessage(taggeeMessage.replace("[player]", attacker.getName()));
         }
 
         // Send combat tag notification to attacker
-        Player attacker = event.getAttacker();
         if (attacker != null && !plugin.getTagManager().isTagged(attacker.getUniqueId())) {
-            attacker.sendMessage(message);
+            attacker.sendMessage(taggerMessage.replace("[player]", victim.getName()));
         }
     }
 

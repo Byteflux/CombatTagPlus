@@ -10,10 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -22,6 +24,8 @@ import java.util.concurrent.Future;
 
 public final class NpcListener implements Listener {
 
+    BukkitTask despawn = null;
+    BukkitTask reset = null;
     private final CombatTagPlus plugin;
 
     public NpcListener(CombatTagPlus plugin) {
@@ -62,7 +66,7 @@ public final class NpcListener implements Listener {
         if (npc == null) return;
 
         // Despawn NPC after npc-despawn-time has elapsed in ticks
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+        despawn = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
             public void run() {
                 plugin.getNpcManager().despawn(npc);
@@ -100,6 +104,34 @@ public final class NpcListener implements Listener {
                 plugin.getNpcManager().despawn(npc, NpcDespawnReason.DEATH);
             }
         });
+    }
+
+    @EventHandler
+    public void hitNpc(EntityDamageByEntityEvent event) {
+        // Reset the time if the configuration says so
+        if (plugin.getSettings().resetTimeOnHit()) {
+
+        // Do nothing if player is not a NPC
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        if (!plugin.getNpcPlayerHelper().isNpc(player)) return;
+
+        // Fetch NPC the player is hitting
+        UUID id = plugin.getNpcPlayerHelper().getIdentity(player).getId();
+        final Npc npc = plugin.getNpcManager().getSpawnedNpc(id);
+
+        // Cancel active despawn tasks
+        if (reset != null) Bukkit.getScheduler().cancelTask(reset.getTaskId());
+        if (despawn != null) Bukkit.getScheduler().cancelTask(despawn.getTaskId());
+
+        // Re-run despawn task
+        reset = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    plugin.getNpcManager().despawn(npc);
+                }
+            }, plugin.getSettings().getNpcDespawnTicks());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

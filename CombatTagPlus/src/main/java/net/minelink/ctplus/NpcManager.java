@@ -2,7 +2,9 @@ package net.minelink.ctplus;
 
 import net.minelink.ctplus.event.NpcDespawnEvent;
 import net.minelink.ctplus.event.NpcDespawnReason;
+import net.minelink.ctplus.event.NpcSpawnEvent;
 import net.minelink.ctplus.task.NpcDespawnTask;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -68,6 +70,9 @@ public final class NpcManager {
             // NOTE: Do not directly access the values in the sound enum, as that can change across versions\
             l.getWorld().playSound(l, EXPLODE_SOUND, 0.9F, 0);
         }
+        
+        NpcSpawnEvent event = new NpcSpawnEvent(npc);
+        Bukkit.getPluginManager().callEvent(event);
 
         // Create and start the NPCs despawn task
         long despawnTime = System.currentTimeMillis() + plugin.getSettings().getNpcDespawnMillis();

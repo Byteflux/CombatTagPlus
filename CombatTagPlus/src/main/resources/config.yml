@@ -79,6 +79,9 @@ disable-crafting-message: '&bCrafting &cis disabled in combat.'
 # The duration in seconds to despawn the combat logger's NPC if it hasn't died.
 npc-despawn-time: 60
 
+# Resets the despawn time when a NPC is hit by a player.
+reset-time-on-hit: true
+
 # Generates a random name for the NPC. Turn this off to use the player name (potentially unsafe!)
 generate-random-name: true
 

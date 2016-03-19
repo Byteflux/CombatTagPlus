@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>CombatTagPlusFactions-v1_6</artifactId>
+  <artifactId>CombatTagPlusCompat-v1_9_R1</artifactId>
 
   <properties>
     <maven.compiler.source>1.7</maven.compiler.source>
@@ -18,8 +18,8 @@
 
   <repositories>
     <repository>
-      <id>minelink-thirdparty</id>
-      <url>http://repo.minelink.net/content/repositories/thirdparty</url>
+      <id>techcable-repo</id>
+      <url>https://repo.techcable.net/content/groups/public/</url>
     </repository>
   </repositories>
 
@@ -27,27 +27,14 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.8.3-R0.1</version>
+      <version>1.9-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.minelink</groupId>
-      <artifactId>CombatTagPlusHook</artifactId>
+      <artifactId>CombatTagPlusCompat-API</artifactId>
       <version>1.2.2-SNAPSHOT</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.massivecraft</groupId>
-      <artifactId>Factions</artifactId>
-      <version>1.6.9.5-U0.1.14</version>
-      <scope>provided</scope>
-      <exclusions>
-        <!-- Its broken -->
-        <exclusion>
-          <groupId>mkremins</groupId>
-          <artifactId>fanciful</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>

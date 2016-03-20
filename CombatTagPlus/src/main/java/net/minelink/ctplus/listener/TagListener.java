@@ -195,21 +195,36 @@ public final class TagListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void sendTagMessage(PlayerCombatTagEvent event) {
-        // Do nothing if tag message is blank
-        String message = plugin.getSettings().getTagMessage();
-        if (message.isEmpty()) return;
 
-        // Send combat tag notification to victim
-        Player victim = event.getVictim();
-        if (victim != null && !plugin.getTagManager().isTagged(victim.getUniqueId()) &&
-                !plugin.getSettings().onlyTagAttacker()) {
-            victim.sendMessage(message);
-        }
-
-        // Send combat tag notification to attacker
         Player attacker = event.getAttacker();
-        if (attacker != null && !plugin.getTagManager().isTagged(attacker.getUniqueId())) {
-            attacker.sendMessage(message);
+        Player victim = event.getVictim();
+        String message;
+        
+        // Send combat tag notification to victim
+        if (victim != null && !plugin.getTagManager().isTagged(victim.getUniqueId()) &&
+            !plugin.getSettings().onlyTagAttacker()) {
+            if(attacker != null) {
+                message = plugin.getSettings().getTagVictimMessage();
+                // Do nothing if tag message is blank
+                if (!message.isEmpty()) {
+                    victim.sendMessage(message.replace("{opponent}", attacker.getName()));
+                }
+            } else {
+                message = plugin.getSettings().getTagMessage();
+                // Do nothing if tag message is blank
+                if (!message.isEmpty()) {
+                    victim.sendMessage(message);
+                }
+            }
+        }
+        
+        message = plugin.getSettings().getTagAttackerMessage();
+        // Do nothing if tag message is blank
+        if (!message.isEmpty()) {
+            // Send combat tag notification to attacker
+            if (attacker != null && !plugin.getTagManager().isTagged(attacker.getUniqueId())) {
+                attacker.sendMessage(message.replace("{opponent}", victim.getName()));
+            }
         }
     }
 

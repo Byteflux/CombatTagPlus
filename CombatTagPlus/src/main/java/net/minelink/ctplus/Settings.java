@@ -189,6 +189,16 @@ public final class Settings {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
+    public String getTagVictimMessage() {
+        String message = plugin.getConfig().getString("tag-victim-message", "");
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+    
+    public String getTagAttackerMessage() {
+        String message = plugin.getConfig().getString("tag-attacker-message", "");
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
     public String getUntagMessage() {
         String message = plugin.getConfig().getString("untag-message", "");
         return ChatColor.translateAlternateColorCodes('&', message);

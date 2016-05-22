@@ -184,8 +184,13 @@ public final class Settings {
         return plugin.getConfig().getInt("tag-duration", 15);
     }
 
-    public String getTagMessage() {
-        String message = plugin.getConfig().getString("tag-message", "");
+    public String getTaggerMessage() {
+        String message = plugin.getConfig().getString("tagger-message", "");
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+    
+    public String getTaggeeMessage() {
+    	String message = plugin.getConfig().getString("taggee-message", "");
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 

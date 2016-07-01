@@ -18,7 +18,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
@@ -27,9 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import net.minelink.ctplus.CombatTagPlus;
 import net.minelink.ctplus.Tag;
 import net.minelink.ctplus.event.PlayerCombatTagEvent;
-import net.minelink.ctplus.task.PlayerReconnectTask;
 import net.minelink.ctplus.task.TagUpdateTask;
-import net.minelink.ctplus.util.DurationUtils;
 
 public final class PlayerListener implements Listener {
 
@@ -319,23 +316,9 @@ public final class PlayerListener implements Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerLogin(PlayerLoginEvent e)
+    public void onPlayerLogin(PlayerLoginEvent event)
     {
-        // Do nothing if the feature is not enabled
-        if(!plugin.getSettings().useReconnectionTimer()) return;
         
-        // Do nothing if player can't login
-        if(e.getResult() != Result.ALLOWED) return;
-        
-        // Check if player has a remaining task and kick him with message
-        if(plugin.getNpcManager().hasReconnectTask(e.getPlayer().getUniqueId())) {
-            PlayerReconnectTask task = plugin.getNpcManager().getReconnectTask(e.getPlayer().getUniqueId());
-            
-            if(task == null) return;
-            
-            String remaining = DurationUtils.format(task.getRemainingSeconds());
-            e.disallow(Result.KICK_OTHER, plugin.getSettings().getReconnectionKickMessage().replace("{remaining}", remaining));
-        }
     }
 
 }

@@ -391,7 +391,7 @@ public final class Settings {
         return plugin.getConfig().getBoolean("untag-on-plugin-teleport");
     }
 
-    public boolean useReconnectionTime() {
+    public boolean useReconnectionTimer() {
         return plugin.getConfig().getBoolean("use-reconnection-time");
     }
 

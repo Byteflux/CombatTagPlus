@@ -82,7 +82,7 @@ public final class NpcManager {
         despawnTasks.put(npc, despawnTask);
         
         // Create and start the player reconnection task if the feature is enabled
-        if(plugin.getSettings().useReconnectionTime()) {
+        if(plugin.getSettings().useReconnectionTimer()) {
             PlayerReconnectTask reconnectTask = new PlayerReconnectTask(plugin, despawnTask, player.getUniqueId());
             reconnectTask.start();
             reconnectTasks.put(player.getUniqueId(), reconnectTask);
@@ -109,6 +109,11 @@ public final class NpcManager {
             NpcDespawnTask despawnTask = getDespawnTask(npc);
             despawnTask.stop();
             despawnTasks.remove(npc);
+        }
+        
+        // Update the reconnect task if the player's NPC have one
+        if(hasReconnectTask(npc.getIdentity().getId())) {
+            getReconnectTask(npc.getIdentity().getId()).setTime(System.currentTimeMillis() + plugin.getSettings().getReconnectionTime() * 1000);
         }
 
         // Remove the NPC entity from the world

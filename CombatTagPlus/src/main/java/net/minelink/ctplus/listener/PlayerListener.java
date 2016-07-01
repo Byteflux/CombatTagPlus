@@ -322,7 +322,7 @@ public final class PlayerListener implements Listener {
     public void onPlayerLogin(PlayerLoginEvent e)
     {
         // Do nothing if the feature is not enabled
-        if(!plugin.getSettings().useReconnectionTime()) return;
+        if(!plugin.getSettings().useReconnectionTimer()) return;
         
         // Do nothing if player can't login
         if(e.getResult() != Result.ALLOWED) return;

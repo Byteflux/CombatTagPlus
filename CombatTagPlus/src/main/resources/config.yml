@@ -96,6 +96,15 @@ generate-random-name: true
 # This is the prefix to use for the random name. 12 characters max.
 random-name-prefix: PvPLogger
 
+# Prevent players from duplicating inventories with NPC when player reconnect by using a timer for reconnection.
+use-reconnection-time: false
+
+# Time the player has to wait after the NPC despawned or died.
+reconnection-time: 5
+
+# This message is displayed when a player attempt to connect before the timer end's.
+reconnection-kick-message: "&cPlease wait {remaining} before reconnection.\n\n &cUse /logout to safely disconnect !"
+
 # This message is displayed when a player is killed by another player. Set this to '' to display nothing.
 kill-message: '&8&l>> &c{victim} was slain by {attacker}'
 

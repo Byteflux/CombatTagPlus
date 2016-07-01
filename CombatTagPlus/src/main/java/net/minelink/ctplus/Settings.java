@@ -390,4 +390,17 @@ public final class Settings {
     public boolean untagOnPluginTeleport() {
         return plugin.getConfig().getBoolean("untag-on-plugin-teleport");
     }
+
+    public boolean useReconnectionTime() {
+        return plugin.getConfig().getBoolean("use-reconnection-time");
+    }
+
+    public int getReconnectionTime() {
+        return plugin.getConfig().getInt("reconnection-time");
+    }
+
+    public String getReconnectionKickMessage() {
+        String message = plugin.getConfig().getString("reconnection-kick-message", ChatColor.RED + "Please wait {remaining} before reconnection.\n\n" + ChatColor.RED + "Use /logout to safely disconnect !");
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 }

@@ -1,8 +1,9 @@
 package net.minelink.ctplus;
 
-import net.minelink.ctplus.event.NpcDespawnEvent;
-import net.minelink.ctplus.event.NpcDespawnReason;
-import net.minelink.ctplus.task.NpcDespawnTask;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -11,10 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import net.minelink.ctplus.event.NpcDespawnEvent;
+import net.minelink.ctplus.event.NpcDespawnReason;
+import net.minelink.ctplus.task.NpcDespawnTask;
+import net.minelink.ctplus.task.PlayerReconnectTask;
 
 public final class NpcManager {
 
@@ -23,6 +24,8 @@ public final class NpcManager {
     private final Map<UUID, Npc> spawnedNpcs = new HashMap<>();
 
     private final Map<Npc, NpcDespawnTask> despawnTasks = new HashMap<>();
+
+    private final Map<UUID, PlayerReconnectTask> reconnectTasks = new HashMap<>();
 
     NpcManager(CombatTagPlus plugin) {
         this.plugin = plugin;
@@ -77,6 +80,13 @@ public final class NpcManager {
         NpcDespawnTask despawnTask = new NpcDespawnTask(plugin, npc, despawnTime);
         despawnTask.start();
         despawnTasks.put(npc, despawnTask);
+        
+        // Create and start the player reconnection task if the feature is enabled
+        if(plugin.getSettings().useReconnectionTime()) {
+            PlayerReconnectTask reconnectTask = new PlayerReconnectTask(plugin, despawnTask, player.getUniqueId());
+            reconnectTask.start();
+            reconnectTasks.put(player.getUniqueId(), reconnectTask);
+        }
 
         return npc;
     }
@@ -120,6 +130,23 @@ public final class NpcManager {
 
     public boolean hasDespawnTask(Npc npc) {
         return despawnTasks.containsKey(npc);
+    }
+
+    public PlayerReconnectTask getReconnectTask(UUID playerUUID) {
+        return reconnectTasks.get(playerUUID);
+    }
+
+    public boolean hasReconnectTask(UUID playerUUID) {
+        return reconnectTasks.containsKey(playerUUID);
+    }
+
+    public void cancelReconnectTask(UUID playerUUID) {
+        PlayerReconnectTask task = reconnectTasks.get(playerUUID);
+        
+        if(task == null) return;
+        
+        task.stop();
+        reconnectTasks.remove(playerUUID);
     }
 
     // Use reflection

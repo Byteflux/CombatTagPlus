@@ -103,7 +103,7 @@ use-reconnection-time: false
 reconnection-time: 5
 
 # This message is displayed when a player attempt to connect before the timer end's.
-reconnection-kick-message: "&cPlease wait {remaining} before reconnection.\n\n &cUse /logout to safely disconnect !"
+reconnection-kick-message: "&cPlease wait {remaining} before reconnecting.\n\n &cUse /logout to safely disconnect !"
 
 # This message is displayed when a player is killed by another player. Set this to '' to display nothing.
 kill-message: '&8&l>> &c{victim} was slain by {attacker}'

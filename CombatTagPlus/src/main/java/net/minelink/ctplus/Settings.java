@@ -391,6 +391,14 @@ public final class Settings {
         return plugin.getConfig().getBoolean("untag-on-plugin-teleport");
     }
 
+    public String getUntaggedCommandReply() {
+    	return plugin.getConfig().getString("untaggedCommandReply");    	
+    }
+    
+    public String getTaggedCommandReply() {
+    	return plugin.getConfig().getString("taggedCommandReply");    	
+    }
+
     public boolean useReconnectionTimer() {
         return plugin.getConfig().getBoolean("use-reconnection-time");
     }

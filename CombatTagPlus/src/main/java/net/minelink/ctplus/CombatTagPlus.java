@@ -29,6 +29,10 @@ import java.util.UUID;
 
 import static org.bukkit.ChatColor.*;
 
+public static String format(String format){
+return ChatColor.translateAlternateColorCodes('&', format);
+}
+
 public final class CombatTagPlus extends JavaPlugin {
 
     private final PlayerCache playerCache = new PlayerCache();

@@ -103,7 +103,7 @@ generate-random-name: true
 # This is the prefix to use for the random name. 12 characters max.
 random-name-prefix: PvPLogger
 
-# Prevent players from duplicating inventories with NPC when player reconnect by using a timer for reconnection.
+# Enable a timer for next reconnection when player disconnect without /logout .
 use-reconnection-time: false
 
 # Time the player has to wait after the NPC despawned or died.

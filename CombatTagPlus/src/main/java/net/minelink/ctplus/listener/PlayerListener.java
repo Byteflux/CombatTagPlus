@@ -24,7 +24,9 @@ import org.bukkit.inventory.ItemStack;
 
 import net.minelink.ctplus.CombatTagPlus;
 import net.minelink.ctplus.Tag;
+import net.minelink.ctplus.event.CombatLogEvent;
 import net.minelink.ctplus.event.PlayerCombatTagEvent;
+import net.minelink.ctplus.task.SafeLogoutTask;
 import net.minelink.ctplus.task.TagUpdateTask;
 
 public final class PlayerListener implements Listener {
@@ -44,6 +46,37 @@ public final class PlayerListener implements Listener {
 
         // Add player to cache
         plugin.getPlayerCache().addPlayer(player);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onLogout(PlayerQuitEvent event) {
+        // Do nothing if player is not combat tagged and NPCs only spawn if tagged
+        Player player = event.getPlayer();
+
+        // Do nothing if player is dead
+        if (player.isDead()) return;
+
+        boolean isTagged = plugin.getTagManager().isTagged(player.getUniqueId());
+        if (!isTagged && !plugin.getSettings().alwaysSpawn()) return;
+
+        // Do nothing if player is not within enabled world
+        if (plugin.getSettings().getDisabledWorlds().contains(player.getWorld().getName())) return;
+
+        // Do nothing if a player logs off in combat in a WorldGuard protected region
+        if (!plugin.getHookManager().isPvpEnabledAt(player.getLocation())) return;
+
+        // Do nothing if player has permission
+        if (player.hasPermission("ctplus.bypass.tag")) return;
+
+        // Do nothing if player has safely logged out
+        if (SafeLogoutTask.isFinished(player)) return;
+
+        plugin.getServer().getPluginManager().callEvent(
+                new CombatLogEvent(
+                        player,
+                        isTagged ? CombatLogEvent.Reason.TAGGED : CombatLogEvent.Reason.UNSAFE_LOGOUT
+                )
+        );
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -122,14 +155,11 @@ public final class PlayerListener implements Listener {
         String message = event.getMessage().toLowerCase();
 
         // Is player using a denied command?
-        for (String command : plugin.getSettings().getDisabledCommands()) {
-            String c = "/" + command.toLowerCase();
-            if (!message.equals(c) && !message.startsWith(c + " ")) continue;
-
+        if (plugin.getSettings().getCommandBlacklist().isBlacklisted(message)) {
             // Cancel command
             event.setCancelled(true);
             if (!plugin.getSettings().getDisabledCommandMessage().isEmpty()) {
-                player.sendMessage(plugin.getSettings().getDisabledCommandMessage().replace("{command}", c));
+                player.sendMessage(plugin.getSettings().getDisabledCommandMessage().replace("{command}", "/" + message.split(" ")[0]));
             }
         }
     }

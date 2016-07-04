@@ -1,5 +1,8 @@
 package net.minelink.ctplus.task;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.UUID;
 
 import org.bukkit.util.NumberConversions;
@@ -19,9 +22,10 @@ public class PlayerReconnectTask implements Runnable {
     private int taskId;
 
     public PlayerReconnectTask(CombatTagPlus plugin, NpcDespawnTask npcDespawnTask, UUID playerUUID) {
-        this.plugin = plugin;
-        this.npcDespawnTask = npcDespawnTask;
-        this.playerUUID = playerUUID;
+        this.plugin = checkNotNull(plugin, "Null plugin");
+        this.npcDespawnTask = checkNotNull(npcDespawnTask, "Null despawnTask");
+        this.playerUUID = checkNotNull(playerUUID, "Null UUID");
+        
     }
 
     public long getTime() {

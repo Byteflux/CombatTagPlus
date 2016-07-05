@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Random;
+import java.util.UUID;
 
 public final class NpcNameGeneratorImpl implements NpcNameGenerator {
 
@@ -18,7 +19,7 @@ public final class NpcNameGeneratorImpl implements NpcNameGenerator {
     }
 
     @Override
-    public String generate(Player player) {
+    public String generateName(Player player) {
         if (!plugin.getSettings().generateRandomName()) {
             return player.getName();
         }
@@ -34,6 +35,15 @@ public final class NpcNameGeneratorImpl implements NpcNameGenerator {
         }
 
         return name;
+    }
+
+    @Override
+    public UUID generateUUID(Player player) {
+        if (!plugin.getSettings().generateRandomUUID()) {
+            return player.getUniqueId();
+        }
+
+        return UUID.randomUUID();
     }
 
 }

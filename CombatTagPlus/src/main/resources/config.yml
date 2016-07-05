@@ -104,6 +104,9 @@ reset-despawn-time-on-hit: true
 # Generates a random name for the NPC. Turn this off to use the player name (potentially unsafe!)
 generate-random-name: true
 
+# Generates a random UUID for the NPC. Turn this off to use the player UUID (potentially unsafe!)
+generate-random-uuid: true
+
 # This is the prefix to use for the random name. 12 characters max.
 random-name-prefix: PvPLogger
 

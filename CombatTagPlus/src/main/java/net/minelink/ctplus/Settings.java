@@ -419,4 +419,8 @@ public final class Settings {
     public String getTaggedCommandReply() {
     	return plugin.getConfig().getString("taggedCommandReply");    	
     }
+
+    public boolean generateRandomUUID() {
+        return plugin.getConfig().getBoolean("generate-random-uuid");
+    }
 }

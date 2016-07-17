@@ -40,8 +40,8 @@ public class FactionsHook implements Hook, FactionsPlugin {
     }
 
     @Override
-    public boolean mayAttack(UUID first, UUID second) {
-        return Voodoo.canDamagerHurtDamagee(first, second);
+    public boolean mayAttack(UUID attacker, @Nullable Location attackerLocation, UUID defender, @Nullable Location defenderLocation) {
+        return Voodoo.canDamagerHurtDamagee(attacker, attackerLocation, defender, defenderLocation);
     }
 
     // We compile against an old version that doesn't have the TRUCE relationship
@@ -49,12 +49,13 @@ public class FactionsHook implements Hook, FactionsPlugin {
     @Nullable
     private static final Relation TRUCE_RELATION;
     static {
+        Relation truceRelation = null;
         try {
-            TRUCE_RELATION = (Relation) Relation.class.getDeclaredField("TRUCE").get(null);
+            truceRelation = (Relation) Relation.class.getDeclaredField("TRUCE").get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            TRUCE_RELATION = null;
             Bukkit.getPluginManager().getPlugin("CombatTagPlus").getLogger().warning("Old version of FactionsUUID found without truce support");
         }
+        TRUCE_RELATION = truceRelation;
         ImmutableMap.Builder<Relation, FactionRelation> relationBuilder = ImmutableMap.builder();
         relationBuilder.put(Relation.ENEMY, FactionRelation.ENEMY);
         relationBuilder.put(Relation.NEUTRAL, FactionRelation.NEUTRAL);

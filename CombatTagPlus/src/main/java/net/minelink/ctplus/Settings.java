@@ -172,10 +172,6 @@ public final class Settings {
         load();
     }
 
-    public boolean areNPCsRequired() {
-        return !instantlyKill() || alwaysSpawn();
-    }
-
     public int getConfigVersion() {
         return plugin.getConfig().getInt("config-version", 0);
     }
@@ -412,16 +408,12 @@ public final class Settings {
         return plugin.getConfig().getBoolean("untag-on-plugin-teleport");
     }
 
-    public String getUntaggedCommandReply() {
-    	return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("untaggedCommandReply"));
+    public String getCommandUntagMessage() {
+        return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("command-untag-message"));
     }
     
-    public String getTaggedCommandReply() {
-    	return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("taggedCommandReply"));
-    }
-
-    public String getCantAttackNpcMessage(String playerName) {
-        return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("cant-attack-npc-message")).replace("{player}", playerName);
+    public String getCommandTagMessage() {
+        return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("command-tag-message"));
     }
 
     public boolean useReconnectionTimer() {

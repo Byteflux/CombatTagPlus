@@ -24,15 +24,12 @@ import net.minelink.ctplus.event.NpcDespawnReason;
 import net.minelink.ctplus.task.PlayerReconnectTask;
 import net.minelink.ctplus.util.DurationUtils;
 
-import static com.google.common.base.Preconditions.*;
-
 public final class NpcListener implements Listener {
 
     private final CombatTagPlus plugin;
 
     public NpcListener(CombatTagPlus plugin) {
-        this.plugin = checkNotNull(plugin, "Null plugin");
-        checkArgument(plugin.hasNpcs(), "The plugin doesn't have npcs enabled!");
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -97,20 +94,6 @@ public final class NpcListener implements Listener {
         Player attacker = (Player) event.getDamager();
         Player npc = (Player) event.getEntity();
         UUID npcPlayerId = plugin.getNpcPlayerHelper().getIdentity(npc).getId();
-        // Factions integration
-        if (plugin.getFactionsPlugin() != null) {
-            // Check if the attacker can attack the NPC's player
-            if (!plugin.getFactionsPlugin().mayAttack(
-                    attacker.getUniqueId(),
-                    attacker.getLocation(),
-                    npcPlayerId,
-                    npc.getLocation())) {
-                event.setCancelled(true);
-                attacker.sendMessage(plugin.getSettings().getCantAttackNpcMessage(plugin.getNpcPlayerHelper().getIdentity(npc).getName()));
-                //noinspection UnnecessaryReturnStatement - ur mum is unnecessary
-                return;
-            }
-        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

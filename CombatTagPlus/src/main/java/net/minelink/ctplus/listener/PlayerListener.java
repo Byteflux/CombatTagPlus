@@ -291,6 +291,10 @@ public final class PlayerListener implements Listener {
             case ENDER_PEARL:
                 return;
             case PLUGIN:
+                if (plugin.getSettings().untagOnPluginTeleport()) {
+                    plugin.getTagManager().untag(player.getUniqueId());
+                }
+                return;
             case UNKNOWN:
                 // Optionally untag on PLUGIN or UNKNOWN
                 if (plugin.getSettings().untagOnPluginTeleport()) {

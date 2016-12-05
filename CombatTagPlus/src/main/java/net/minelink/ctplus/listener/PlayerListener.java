@@ -1,11 +1,6 @@
 package net.minelink.ctplus.listener;
 
-import net.minelink.ctplus.CombatTagPlus;
-import net.minelink.ctplus.Tag;
-import net.minelink.ctplus.event.CombatLogEvent;
-import net.minelink.ctplus.event.PlayerCombatTagEvent;
-import net.minelink.ctplus.task.SafeLogoutTask;
-import net.minelink.ctplus.task.TagUpdateTask;
+import java.util.UUID;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -19,7 +14,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -28,7 +22,12 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
+import net.minelink.ctplus.CombatTagPlus;
+import net.minelink.ctplus.Tag;
+import net.minelink.ctplus.event.CombatLogEvent;
+import net.minelink.ctplus.event.PlayerCombatTagEvent;
+import net.minelink.ctplus.task.SafeLogoutTask;
+import net.minelink.ctplus.task.TagUpdateTask;
 
 public final class PlayerListener implements Listener {
 
@@ -346,5 +345,5 @@ public final class PlayerListener implements Listener {
             event.setCancelled(true);
         }
     }
-
+    
 }

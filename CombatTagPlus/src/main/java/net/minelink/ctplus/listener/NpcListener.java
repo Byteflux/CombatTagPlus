@@ -5,12 +5,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import net.minelink.ctplus.CombatTagPlus;
-import net.minelink.ctplus.Npc;
-import net.minelink.ctplus.event.NpcDespawnEvent;
-import net.minelink.ctplus.event.NpcDespawnReason;
-import net.minelink.ctplus.event.CombatLogEvent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +13,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
+
+import net.minelink.ctplus.CombatTagPlus;
+import net.minelink.ctplus.Npc;
+import net.minelink.ctplus.event.CombatLogEvent;
+import net.minelink.ctplus.event.NpcDespawnEvent;
+import net.minelink.ctplus.event.NpcDespawnReason;
+import net.minelink.ctplus.task.PlayerReconnectTask;
+import net.minelink.ctplus.util.DurationUtils;
 
 public final class NpcListener implements Listener {
 
@@ -39,8 +42,21 @@ public final class NpcListener implements Listener {
         plugin.getNpcManager().spawn(player);
     }
 
-    @EventHandler
-    public void despawnNpc(PlayerJoinEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void despawnNpc(PlayerLoginEvent event) {
+        // Do nothing if player can't login
+        if(event.getResult() != Result.ALLOWED) return;
+        
+        // Check if player has a remaining task and kick him with message
+        if(plugin.getNpcManager().hasReconnectTask(event.getPlayer().getUniqueId())) {
+            PlayerReconnectTask task = plugin.getNpcManager().getReconnectTask(event.getPlayer().getUniqueId());
+            if(task != null) {
+                String remaining = DurationUtils.format(task.getRemainingSeconds());
+                event.disallow(Result.KICK_OTHER, plugin.getSettings().getReconnectionKickMessage().replace("{remaining}", remaining));
+                return;
+            }
+        }
+        
         // Attempt to despawn NPC
         Npc npc = plugin.getNpcManager().getSpawnedNpc(event.getPlayer().getUniqueId());
         if (npc != null) {

@@ -1,7 +1,16 @@
 package net.minelink.ctplus;
 
-import java.io.IOException;
+import static org.bukkit.ChatColor.GREEN;
+import static org.bukkit.ChatColor.RED;
+
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import net.minelink.ctplus.compat.api.NpcNameGeneratorFactory;
 import net.minelink.ctplus.compat.api.NpcPlayerHelper;
@@ -20,16 +29,6 @@ import net.minelink.ctplus.task.TagUpdateTask;
 import net.minelink.ctplus.util.BarUtils;
 import net.minelink.ctplus.util.ReflectionUtils;
 import net.minelink.ctplus.util.Version;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.MetricsLite;
-
-import static org.bukkit.ChatColor.*;
 
 public final class CombatTagPlus extends JavaPlugin {
 
@@ -133,12 +132,6 @@ public final class CombatTagPlus extends JavaPlugin {
                 SafeLogoutTask.purgeFinished();
             }
         }, 3600, 3600);
-
-        // Start metrics
-        try {
-            MetricsLite metrics = new MetricsLite(this);
-            metrics.start();
-        } catch (IOException ignore) {}
     }
 
     @Override

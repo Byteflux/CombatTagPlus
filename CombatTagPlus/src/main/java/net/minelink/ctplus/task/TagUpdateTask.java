@@ -51,6 +51,9 @@ public final class TagUpdateTask extends BukkitRunnable {
             if (!plugin.getSettings().getUntagMessage().isEmpty()) {
                 player.sendMessage(plugin.getSettings().getUntagMessage());
             }
+
+            plugin.getTagManager().untag(player.getUniqueId());
+
             cancel();
             return;
         }

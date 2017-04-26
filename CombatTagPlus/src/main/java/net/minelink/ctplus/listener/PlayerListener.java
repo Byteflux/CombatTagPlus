@@ -353,6 +353,10 @@ public final class PlayerListener implements Listener {
             case COMMAND: // Essentials uses COMMAND instead of PLUGIN
                           //  Thank you @ExoticCoding -- addresses #85
             case PLUGIN:
+                if (plugin.getSettings().untagOnPluginTeleport()) {
+                    plugin.getTagManager().untag(player.getUniqueId());
+                }
+                return;
             case UNKNOWN:
                 // Optionally untag on PLUGIN or UNKNOWN
                 if (plugin.getSettings().untagOnPluginTeleport()) {

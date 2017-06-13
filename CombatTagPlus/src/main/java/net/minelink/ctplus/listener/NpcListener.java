@@ -165,7 +165,7 @@ public final class NpcListener implements Listener {
         player.setMaximumAir(npcPlayer.getMaximumAir());
         player.setRemainingAir(npcPlayer.getRemainingAir());
         player.setHealthScale(npcPlayer.getHealthScale());
-        player.setMaxHealth(npcPlayer.getMaxHealth());
+        player.setMaxHealth(getMaxHealth(npcPlayer));
         player.setHealth(npcPlayer.getHealth());
         player.setTotalExperience(npcPlayer.getTotalExperience());
         player.setFoodLevel(npcPlayer.getFoodLevel());
@@ -175,6 +175,21 @@ public final class NpcListener implements Listener {
         player.getInventory().setContents(npcPlayer.getInventory().getContents());
         player.getInventory().setArmorContents(npcPlayer.getInventory().getArmorContents());
         player.addPotionEffects(npcPlayer.getActivePotionEffects());
+    }
+    
+    //This is to protect agenst players with the health boost potion effect.
+    //This stops the max health from going up when the player has health boost since it adds to the max health.
+    @SuppressWarnings("deprecation")
+	private double getMaxHealth(Player npcPlayer){
+    	double health = npcPlayer.getMaxHealth();
+    	for(PotionEffect p : npcPlayer.getActivePotionEffects()){
+            //Had to do this because doing if(p.getType() == PotionEffectType.HEALTH_BOOST)
+            //It wouldn't recognize it as the same.
+    		if(p.getType().getName().equalsIgnoreCase(PotionEffectType.HEALTH_BOOST.getName())){
+    			health -= ((p.getAmplifier() + 1) * 4);
+    		}
+    	}
+    	return health;
     }
 
 }
